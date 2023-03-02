@@ -1,0 +1,33 @@
+echo "# SampleEthereumNodeHostedonAzure" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/iantstaley/SampleEthereumNodeHostedonAzure.git
+git push -u origin main
+const Web3 = require('web3');
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545')); // replace with your Ethereum node URL
+
+// deploy a smart contract
+const contractABI = [{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"set","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"get","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}];
+const contractBytecode = '0x6060604052341561000f57600080fd5b5b60ab8061001e6000396000f30060606040526000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806360fe47b114602d575b600080fd5b3415603757600080fd5b606b6004808035906020019091905050607f565b6040518082815260200191505060405180910390f35b60006007820290506099565b91905056';
+
+const contract = new web3.eth.Contract(contractABI);
+const deployTransaction = contract.deploy({
+  data: contractBytecode,
+  arguments: []
+}).send({
+  from: '0x1234567890123456789012345678901234567890', // replace with your account address
+  gas: 1500000,
+  gasPrice: '30000000000' // 30 gwei
+}).then((newContractInstance) => {
+  console.log('Contract deployed at address: ' + newContractInstance.options.address);
+});
+
+// interact with a smart contract
+const contractAddress = '0x1234567890123456789012345678901234567890'; // replace with your contract address
+const contractInstance = new web3.eth.Contract(contractABI, contractAddress);
+
+contractInstance.methods.get().call().then((result) => {
+  console.log('Result of get() function: ' + result);
+});
